@@ -1,0 +1,4 @@
+FriendsList
+===========
+
+Simple project
