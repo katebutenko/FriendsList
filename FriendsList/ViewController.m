@@ -87,4 +87,17 @@ NSMutableArray *tableData;
     return YES;
 }
 
+- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
+    
+    NSString *stringToMove = [tableData objectAtIndex:sourceIndexPath.row];
+    [tableData removeObjectAtIndex:sourceIndexPath.row];
+    [tableData insertObject:stringToMove atIndex:destinationIndexPath.row];
+    
+}
+
+- (NSIndexPath *)tableView:(UITableView *)tableView targetIndexPathForMoveFromRowAtIndexPath:(NSIndexPath *)sourceIndexPath toProposedIndexPath:(NSIndexPath *)proposedDestinationIndexPath {
+        // Allow the proposed destination.
+    return proposedDestinationIndexPath;
+}
+
 @end
