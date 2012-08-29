@@ -72,14 +72,20 @@ NSMutableArray *tableData;
 // React to Edit button
 - (void)setEditing:(BOOL)editing animated:(BOOL)animated {
     if(self.editing)
-    {        
+    {
+        [super setEditing:NO animated:NO];
         [tableView setEditing:NO animated:NO];
         [tableView reloadData];
+        [self.navigationItem.leftBarButtonItem setTitle:@"Edit"];
+        [self.navigationItem.leftBarButtonItem setStyle:UIBarButtonItemStylePlain];
     }
     else
     {
+        [super setEditing:YES animated:YES];
         [tableView setEditing:YES animated:YES];
         [tableView reloadData];
+        [self.navigationItem.leftBarButtonItem setTitle:@"Done"];
+        [self.navigationItem.leftBarButtonItem setStyle:UIBarButtonItemStyleDone];
     }
 }
 //Resolve the possibility to move
