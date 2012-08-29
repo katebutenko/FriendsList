@@ -20,9 +20,12 @@ NSMutableArray *tableData;
 {
     [super viewDidLoad];
     
-    // Initialize table data with names from "Game of Thrones"
-    
+    // Initialize table data with names from "Game of Thrones"    
     tableData = [NSMutableArray arrayWithObjects:@"Khaleesi", @"Eddard", @"Arya", @"Tyrion", @"Cersei", @"Jon Snow", @"Joffrey", @"Mormont", @"Sansa",@"Drogo",nil];
+    
+    // Add an Edit button to navigation bar
+	self.navigationItem.rightBarButtonItem = self.editButtonItem;
+    
 
 }
 
@@ -43,11 +46,11 @@ NSMutableArray *tableData;
     return [tableData count];
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+- (UITableViewCell *)tableView:(UITableView *)tableViewLocal cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     static NSString *simpleTableIdentifier = @"SimpleTableItem";
     
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
+    UITableViewCell *cell = [tableViewLocal dequeueReusableCellWithIdentifier:simpleTableIdentifier];
     
     if (cell == nil) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier];
@@ -58,11 +61,36 @@ NSMutableArray *tableData;
 }
 
 /* row removed on swipe */
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
+- (void)tableView:(UITableView *)tableViewLocal commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
 {
     [tableData removeObjectAtIndex:indexPath.row];
     
-    [tableView reloadData];
+    [tableViewLocal reloadData];
+}
+
+
+// React to Edit button
+- (void)setEditing:(BOOL)editing animated:(BOOL)animated {
+    if(self.editing)
+    {
+        [super setEditing:NO animated:NO];
+        [tableView setEditing:NO animated:NO];
+        [tableView reloadData];
+        [self.navigationItem.leftBarButtonItem setTitle:@"Edit"];
+        [self.navigationItem.leftBarButtonItem setStyle:UIBarButtonItemStylePlain];
+    }
+    else
+    {
+        [super setEditing:YES animated:YES];
+        [tableView setEditing:YES animated:YES];
+        [tableView reloadData];
+        [self.navigationItem.leftBarButtonItem setTitle:@"Done"];
+        [self.navigationItem.leftBarButtonItem setStyle:UIBarButtonItemStyleDone];
+    }
+}
+//Resolve the possibility to move
+- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
+    return YES;
 }
 
 @end
