@@ -76,16 +76,16 @@ NSMutableArray *tableData;
         [super setEditing:NO animated:NO];
         [tableView setEditing:NO animated:NO];
         [tableView reloadData];
-        [self.navigationItem.leftBarButtonItem setTitle:@"Edit"];
-        [self.navigationItem.leftBarButtonItem setStyle:UIBarButtonItemStylePlain];
+        [self.editButtonItem setTitle:@"Edit"];
+        [self.editButtonItem setStyle:UIBarButtonItemStylePlain];
     }
     else
     {
         [super setEditing:YES animated:YES];
         [tableView setEditing:YES animated:YES];
         [tableView reloadData];
-        [self.navigationItem.leftBarButtonItem setTitle:@"Done"];
-        [self.navigationItem.leftBarButtonItem setStyle:UIBarButtonItemStyleDone];
+        [self.editButtonItem setTitle:@"Done"];
+        [self.editButtonItem setStyle:UIBarButtonItemStyleDone];
     }
 }
 //Resolve the possibility to move
