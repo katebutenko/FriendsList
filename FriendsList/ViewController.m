@@ -7,6 +7,7 @@
 //
 
 #import "ViewController.h"
+#import "DataManager.h"
 
 @interface ViewController ()
  
@@ -21,8 +22,8 @@ NSMutableArray *tableData;
     [super viewDidLoad];
     
     // Initialize table data with names from "Game of Thrones"    
-    tableData = [NSMutableArray arrayWithObjects:@"Khaleesi", @"Eddard", @"Arya", @"Tyrion", @"Cersei", @"Jon Snow", @"Joffrey", @"Mormont", @"Sansa",@"Drogo",nil];
-    
+    tableData = [DataManager loadDataFromFile];
+
     // Add an Edit button to navigation bar
 	self.navigationItem.rightBarButtonItem = self.editButtonItem;
     
@@ -31,6 +32,7 @@ NSMutableArray *tableData;
 
 - (void)viewDidUnload
 {
+    [DataManager saveToFile:tableData];
     [super viewDidUnload];
 }
 
@@ -102,7 +104,7 @@ NSMutableArray *tableData;
 }
 
 - (NSIndexPath *)tableView:(UITableView *)tableView targetIndexPathForMoveFromRowAtIndexPath:(NSIndexPath *)sourceIndexPath toProposedIndexPath:(NSIndexPath *)proposedDestinationIndexPath {
-        // Allow the proposed destination.
+    // Allow the proposed destination.
     return proposedDestinationIndexPath;
 }
 
