@@ -10,7 +10,7 @@
 
 @interface DataManager : NSObject
 
-     +(NSMutableArray*) defaultData;
+    +(NSMutableArray*) defaultData;
 
     +(NSString *) filePath;
     +(void) saveToFile:(NSArray *) arrayOfData;
