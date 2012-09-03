@@ -41,8 +41,7 @@ NSMutableArray *tableData;
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    int count = [tableData count];
-	if(self.editing) count++;
+    int count = [tableData count]+1;
     return count;
 }
 
@@ -57,9 +56,8 @@ NSMutableArray *tableData;
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier];
     }
     
-    //if we are in editing mode, add last editable cell to the table
-    
-    if(indexPath.row == ([tableData count]) && self.editing){
+    //if we are in editing mode, add last editable cell to the table   
+    if(indexPath.row == 0 && self.editing){
         //check if we do not already have editable field. If yes - reuse it.
         if (newNameField==nil) {
             newNameField = [self makeTextField:@"Enter new name here" ];
@@ -75,13 +73,19 @@ NSMutableArray *tableData;
         // We want to handle textFieldDidEndEditing
         newNameField.delegate = self;
         
-        // This cell should display no text, just a placeholder
-        cell.textLabel.text = @"";
 		return cell;
 	}
+    
+    if (indexPath.row==0) {
+        // This cell should display no text, just a placeholder
+        cell.textLabel.text = @"";
+    }
+    
     //if the cell was a simple cell, fill it with data from source
-    cell.textLabel.text = [tableData objectAtIndex:indexPath.row];
-        
+    if (indexPath.row>0){
+        cell.textLabel.text = [tableData objectAtIndex:indexPath.row-1];
+    }    
+    
     return cell;
 }
 
@@ -89,7 +93,7 @@ NSMutableArray *tableData;
 - (void)tableView:(UITableView *)tableViewLocal commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
-        [tableData removeObjectAtIndex:indexPath.row];
+        [tableData removeObjectAtIndex:indexPath.row-1];
     }
     
     [tableViewLocal reloadData];
@@ -125,21 +129,21 @@ NSMutableArray *tableData;
 
 //Resolve the possibility to move
 - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.row >= [tableData count]) return NO;
+    if (indexPath.row == 0) return NO;
     return YES;
 }
 
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
     
-    NSString *stringToMove = [tableData objectAtIndex:sourceIndexPath.row];
-    [tableData removeObjectAtIndex:sourceIndexPath.row];
-    [tableData insertObject:stringToMove atIndex:destinationIndexPath.row];
+    NSString *stringToMove = [tableData objectAtIndex:sourceIndexPath.row-1];
+    [tableData removeObjectAtIndex:sourceIndexPath.row+1];
+    [tableData insertObject:stringToMove atIndex:destinationIndexPath.row-1];
     
 }
 
 - (NSIndexPath *)tableView:(UITableView *)tableView targetIndexPathForMoveFromRowAtIndexPath:(NSIndexPath *)sourceIndexPath toProposedIndexPath:(NSIndexPath *)proposedDestinationIndexPath {
     // Do not allow to move items over editable cell
-    if (proposedDestinationIndexPath.row>=[tableData count]) {
+    if (proposedDestinationIndexPath.row==0) {
         return sourceIndexPath;
     }
     return proposedDestinationIndexPath;
@@ -150,7 +154,7 @@ NSMutableArray *tableData;
     if (self.editing == NO || !indexPath) {
      return UITableViewCellEditingStyleNone;   
     }
-    if (self.editing && indexPath.row == [tableData count]) {
+    if (self.editing && indexPath.row == 0) {
 		return UITableViewCellEditingStyleInsert;
 	} else {
 		return UITableViewCellEditingStyleDelete;
