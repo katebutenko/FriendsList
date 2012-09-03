@@ -9,9 +9,6 @@
 #import "ViewController.h"
 #import "DataManager.h"
 
-@interface ViewController ()
- 
-@end
 
 @implementation ViewController
 
@@ -26,7 +23,7 @@ NSMutableArray *tableData;
 
     // Add an Edit button to navigation bar
 	self.navigationItem.rightBarButtonItem = self.editButtonItem;
-    
+    [self setTitle:@"Game of Thrones"];
 
 }
 
@@ -51,6 +48,7 @@ NSMutableArray *tableData;
 
 - (UITableViewCell *)tableView:(UITableView *)tableViewLocal cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    //for most of the cells, simply create them
     static NSString *simpleTableIdentifier = @"SimpleTableItem";
     
     UITableViewCell *cell = [tableViewLocal dequeueReusableCellWithIdentifier:simpleTableIdentifier];
@@ -59,14 +57,29 @@ NSMutableArray *tableData;
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier];
     }
     
-    //int count = 0;
-	//if(self.editing && indexPath.row != 0)
-	//	count = 1;
-	
+    //if we are in editing mode, add last editable cell to the table
+    
     if(indexPath.row == ([tableData count]) && self.editing){
-		cell.textLabel.text = @"Add Data";
+        //check if we do not already have editable field. If yes - reuse it.
+        if (newNameField==nil) {
+            newNameField = [self makeTextField:@"Enter new name here" ];
+        }
+        
+        [cell addSubview:newNameField];
+        // Textfield dimensions
+        newNameField.frame = CGRectMake(40, 6, 270, 30);
+        
+        // dismiss keyboard when Done/Return is tapped
+        [newNameField addTarget:self action:@selector(textFieldFinished:) forControlEvents:UIControlEventEditingDidEndOnExit];	
+        
+        // We want to handle textFieldDidEndEditing
+        newNameField.delegate = self;
+        
+        // This cell should display no text, just a placeholder
+        cell.textLabel.text = @"";
 		return cell;
 	}
+    //if the cell was a simple cell, fill it with data from source
     cell.textLabel.text = [tableData objectAtIndex:indexPath.row];
         
     return cell;
@@ -77,19 +90,21 @@ NSMutableArray *tableData;
 {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         [tableData removeObjectAtIndex:indexPath.row];
-    } else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        [tableData addObject:@"NewName"];
     }
     
     [tableViewLocal reloadData];
 }
 
-
 // React to Edit button
 - (void)setEditing:(BOOL)editing animated:(BOOL)animated {
     if(self.editing)
     {
+        //add object to the table only if user has entered something
+        if ([newNameField.text length]!=0) {
+            [tableData addObject:newNameField.text];
+        }
         [DataManager saveToFile:tableData];
+        [newNameField removeFromSuperview];
         [super setEditing:NO animated:NO];
         [tableView setEditing:NO animated:NO];
         [tableView reloadData];
@@ -97,7 +112,9 @@ NSMutableArray *tableData;
         [self.editButtonItem setStyle:UIBarButtonItemStylePlain];
     }
     else
-    {
+    { 
+        //clear editable cell
+        if (newNameField !=nil) newNameField.text=@"";
         [super setEditing:YES animated:YES];        
         [tableView setEditing:YES animated:YES];
         [tableView reloadData];
@@ -105,8 +122,10 @@ NSMutableArray *tableData;
         [self.editButtonItem setStyle:UIBarButtonItemStyleDone];
     }
 }
+
 //Resolve the possibility to move
 - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (indexPath.row >= [tableData count]) return NO;
     return YES;
 }
 
@@ -119,11 +138,14 @@ NSMutableArray *tableData;
 }
 
 - (NSIndexPath *)tableView:(UITableView *)tableView targetIndexPathForMoveFromRowAtIndexPath:(NSIndexPath *)sourceIndexPath toProposedIndexPath:(NSIndexPath *)proposedDestinationIndexPath {
-    // Allow the proposed destination.
+    // Do not allow to move items over editable cell
+    if (proposedDestinationIndexPath.row>=[tableData count]) {
+        return sourceIndexPath;
+    }
     return proposedDestinationIndexPath;
 }
 
-//ability to Add new cells
+//ability to add new cells
 - (UITableViewCellEditingStyle)tableView:(UITableView *)aTableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath {
     if (self.editing == NO || !indexPath) {
      return UITableViewCellEditingStyleNone;   
@@ -135,5 +157,22 @@ NSMutableArray *tableData;
 	}
     return UITableViewCellEditingStyleNone;
 }
+//create text field for editable cell
+-(UITextField*) makeTextField:(NSString*)placeholderText {
+	UITextField *tf = [[UITextField alloc] init];
+    tf.placeholder = placeholderText;         
+	tf.autocorrectionType = UITextAutocorrectionTypeNo ;
+	tf.autocapitalizationType = UITextAutocapitalizationTypeNone;
+	tf.adjustsFontSizeToFitWidth = YES;
+    tf.borderStyle = UITextBorderStyleRoundedRect;
+    tf.textAlignment = UITextAlignmentLeft;
+    tf.font = [UIFont boldSystemFontOfSize:20.0];
+    
+	return tf ;
+}
 
+//override what is done on pressing Return button on keyboard
+- (IBAction)textFieldFinished:(id)sender {
+   
+}
 @end

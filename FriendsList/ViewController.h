@@ -8,9 +8,13 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ViewController : UIViewController <UITableViewDelegate, UITableViewDataSource>
+@interface ViewController : UIViewController <UITableViewDelegate, UITableViewDataSource,UITextFieldDelegate>
 {
     IBOutlet UITableView *tableView;
+    UITextField* newNameField;
 }
+-(UITextField*) makeTextField:(NSString*)placeholder  ;
+    //@property (nonatomic, weak) IBOutlet UITextField *textField;
+
 
 @end
