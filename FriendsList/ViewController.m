@@ -105,7 +105,7 @@ NSMutableArray *tableData;
     {
         //add object to the table only if user has entered something
         if ([newNameField.text length]!=0) {
-            [tableData addObject:newNameField.text];
+            [tableData insertObject:newNameField.text atIndex:0];
         }
         [DataManager saveToFile:tableData];
         [newNameField removeFromSuperview];
@@ -134,16 +134,17 @@ NSMutableArray *tableData;
 }
 
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
-    
-    NSString *stringToMove = [tableData objectAtIndex:sourceIndexPath.row-1];
-    [tableData removeObjectAtIndex:sourceIndexPath.row+1];
-    [tableData insertObject:stringToMove atIndex:destinationIndexPath.row-1];
-    
+    //fix a bug that appeared when dragging a table item over the last one
+    if (destinationIndexPath.row<[tableData count]) {
+        NSString *stringToMove = [tableData objectAtIndex:sourceIndexPath.row-1];
+        [tableData removeObjectAtIndex:sourceIndexPath.row-1];
+        [tableData insertObject:stringToMove atIndex:destinationIndexPath.row-1];
+    }
 }
 
 - (NSIndexPath *)tableView:(UITableView *)tableView targetIndexPathForMoveFromRowAtIndexPath:(NSIndexPath *)sourceIndexPath toProposedIndexPath:(NSIndexPath *)proposedDestinationIndexPath {
-    // Do not allow to move items over editable cell
-    if (proposedDestinationIndexPath.row==0) {
+    // Do not allow to move items over editable cell or end of the list
+    if (proposedDestinationIndexPath.row<=0||proposedDestinationIndexPath.row>[tableData count]) {
         return sourceIndexPath;
     }
     return proposedDestinationIndexPath;
